@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Callable, Dict, List, Optional
 
 from pydantic import BaseModel
-from qcio import SPCalcType
+from qcio import SinglePointCalcType as SPCalcType
 
 from .exceptions import RegistryError
 
@@ -16,14 +16,14 @@ class ParserSpec(BaseModel):
         required: Whether the parser is required to be successful for the parsing to
             be considered successful. If True and the parser fails a MatchNotFoundError
             will be raised. If False and the parser fails the value will be ignored.
-        calc_types: The calculation types that the parser work on.
+        calctypes: The calculation types that the parser work on.
     """
 
     parser: Callable
     filetype: str
     required: bool
     input_data: bool = False
-    calc_types: List[SPCalcType]
+    calctypes: List[SPCalcType]
 
 
 class ParserRegistry(BaseModel):
@@ -38,7 +38,7 @@ class ParserRegistry(BaseModel):
         filetype: str,
         required: bool,
         input_data: bool,
-        only: Optional[List[SPCalcType]],
+        only: Optional[List[SPCalcType]] = None,
     ) -> None:
         """Register a new parser function.
 
@@ -59,7 +59,7 @@ class ParserRegistry(BaseModel):
             required=required,
             input_data=input_data,
             # If only not passed then register for all calculation types
-            calc_types=only
+            calctypes=only
             or [SPCalcType.energy, SPCalcType.gradient, SPCalcType.hessian],
         )
         self.registry[program].append(parser_info)
@@ -69,7 +69,7 @@ class ParserRegistry(BaseModel):
         program: str,
         filetype: Optional[str] = None,
         collect_inputs: bool = True,
-        calc_type: Optional[SPCalcType] = None,
+        calctype: Optional[SPCalcType] = None,
     ) -> List[ParserSpec]:
         """Get all parser functions for a given program.
 
@@ -77,7 +77,7 @@ class ParserRegistry(BaseModel):
             program: The program to get parsers for.
             filetype: If given only return parsers for this filetype.
             collect_inputs: If False return only parsers for output data.
-            calc_type: Filter parsers for a given calculation type.
+            calctype: Filter parsers for a given calculation type.
 
         Returns:
             List of ParserSpec objects.
@@ -94,8 +94,8 @@ class ParserRegistry(BaseModel):
         if not collect_inputs:
             parsers = [p_spec for p_spec in parsers if not p_spec.input_data]
 
-        if calc_type:
-            parsers = [p_spec for p_spec in parsers if calc_type in p_spec.calc_types]
+        if calctype:
+            parsers = [p_spec for p_spec in parsers if calctype in p_spec.calctypes]
         return parsers
 
     def supported_programs(self) -> List[str]:

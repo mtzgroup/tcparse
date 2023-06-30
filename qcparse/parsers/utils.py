@@ -3,7 +3,7 @@ import inspect
 import re
 from typing import List, Optional
 
-from qcio import SPCalcType
+from qcio import SinglePointCalcType as SPCalcType
 
 from qcparse.exceptions import MatchNotFoundError
 from qcparse.registry import registry

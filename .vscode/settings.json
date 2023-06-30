@@ -2,6 +2,8 @@
     "python.formatting.provider": "black",
     "cSpell.words": [
         "calcinfo",
+        "calctype",
+        "calctypes",
         "CUDA",
         "Hartree",
         "htmlcov",

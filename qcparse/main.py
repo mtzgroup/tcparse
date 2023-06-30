@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 from qcio import (
-    SinglePointComputedProperties,
-    SinglePointFailedOutput,
+    SinglePointComputedProps,
+    SinglePointFailure,
     SinglePointInput,
-    SinglePointSuccessfulOutput,
+    SinglePointResult,
 )
 
 from .exceptions import MatchNotFoundError
@@ -24,7 +24,7 @@ def parse_computed_props(
     data_or_path: Union[str, bytes, Path],
     program: str,
     filetype: str = "stdout",
-) -> SinglePointComputedProperties:
+) -> SinglePointComputedProps:
     """Parse a file using the parsers registered for the given program.
 
     Args:
@@ -39,7 +39,7 @@ def parse_computed_props(
             >>> registry.supported_filetypes('program_name')
 
     Returns:
-        A SinglePointComputedProperties object containing the parsed data.
+        A SinglePointComputedProps object containing the parsed data.
 
     Raises:
         MatchNotFoundError: If a required parser fails to parse its data.
@@ -51,18 +51,18 @@ def parse_computed_props(
 
     # Get the calculation type if filetype is 'stdout'
     if filetype == "stdout":
-        parse_calc_type = import_module(f"qcparse.parsers.{program}").parse_calc_type
-        calc_type = parse_calc_type(file_content)
+        parse_calctype = import_module(f"qcparse.parsers.{program}").parse_calctype
+        calctype = parse_calctype(file_content)
 
     else:
-        calc_type = None
+        calctype = None
 
     # Get all the parsers for the program and filetype
     parsers: List[ParserSpec] = registry.get_parsers(
         program,
         filetype=filetype,
         collect_inputs=False,
-        calc_type=calc_type,
+        calctype=calctype,
     )
 
     # Apply parsers to the file content.
@@ -80,7 +80,7 @@ def parse_computed_props(
     # Remove scratch data
     del data_collector.scratch
 
-    return SinglePointComputedProperties(**data_collector.computed.dict())
+    return SinglePointComputedProps(**data_collector.computed.dict())
 
 
 # TODO: Finish out this function for parsing full inputs, outputs, and failures
@@ -91,7 +91,7 @@ def parse(
     program: str,
     filetype: str = "stdout",
     input_data: Optional[SinglePointInput] = None,
-) -> Union[SinglePointSuccessfulOutput, SinglePointFailedOutput]:
+) -> Union[SinglePointResult, SinglePointFailure]:
     """Parse a file using the parsers registered for the given program.
 
     Args:
@@ -123,9 +123,9 @@ def parse(
 
     # # Get the calculation type if filetype is 'stdout'
     # if filetype == "stdout":
-    #     parse_calc_type = import_module(f"qcparse.parsers.{program}").parse_calc_type
-    #     calc_type = parse_calc_type(file_content)
-    #     data_collector.input_data.program_args.calc_type = calc_type
+    #     parse_calctype = import_module(f"qcparse.parsers.{program}").parse_calctype
+    #     calctype = parse_calctype(file_content)
+    #     data_collector.input_data.calctype = calctype
 
     #     # Determine if calculation succeeded
     #     parse_calculation_succeeded = import_module(
@@ -137,14 +137,14 @@ def parse(
 
     #     data_collector.stdout = file_content
     # else:
-    #     calc_type = None
+    #     calctype = None
 
     # # Get all the parsers for the program and filetype
     # parsers: List[ParserSpec] = registry.get_parsers(
     #     program,
     #     filetype=filetype,
     #     collect_inputs=collect_inputs,
-    #     calc_type=calc_type,
+    #     calctype=calctype,
     # )
 
     # # Apply parsers to the file content.
@@ -175,7 +175,7 @@ def parse(
     # # Remove scratch data
     # del data_collector.scratch
 
-    # return SinglePointSuccessfulOutput(**data_collector.dict())
+    # return SinglePointResult(**data_collector.dict())
 
 
 if __name__ == "__main__":

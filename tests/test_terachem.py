@@ -1,13 +1,13 @@
 from pathlib import Path
 
 import pytest
-from qcio import SPCalcType
+from qcio import SinglePointCalcType as SPCalcType
 
 from qcparse.exceptions import MatchNotFoundError
 from qcparse.parsers.terachem import (
     calculation_succeeded,
     parse_basis,
-    parse_calc_type,
+    parse_calctype,
     parse_energy,
     parse_git_commit,
     parse_gradient,
@@ -60,22 +60,22 @@ def test_parse_energy_raises_exception(data_collector):
 
 
 @pytest.mark.parametrize(
-    "filename,calc_type",
+    "filename,calctype",
     (
         ("water.energy.out", SPCalcType.energy),
         ("water.gradient.out", SPCalcType.gradient),
         ("water.frequencies.out", SPCalcType.hessian),
     ),
 )
-def test_parse_calc_type(test_data_dir, filename, calc_type):
+def test_parse_calctype(test_data_dir, filename, calctype):
     with open(test_data_dir / filename) as f:
         string = f.read()
-    assert parse_calc_type(string) == calc_type
+    assert parse_calctype(string) == calctype
 
 
-def test_parse_calc_type_raises_exception():
+def test_parse_calctype_raises_exception():
     with pytest.raises(MatchNotFoundError):
-        parse_calc_type("No driver here")
+        parse_calctype("No driver here")
 
 
 @pytest.mark.parametrize(
@@ -103,12 +103,12 @@ def test_parse_method(test_data_dir, filename, method, data_collector):
     with open(test_data_dir / filename) as f:
         tcout = f.read()
     parse_method(tcout, data_collector)
-    assert data_collector.input_data.program_args.model.method == method
+    assert data_collector.input_data.model.method == method
 
 
 def test_parse_basis(terachem_energy_stdout, data_collector):
     parse_basis(terachem_energy_stdout, data_collector)
-    assert data_collector.input_data.program_args.model.basis == "6-31g"
+    assert data_collector.input_data.model.basis == "6-31g"
 
 
 def test_parse_version(terachem_energy_stdout, data_collector):

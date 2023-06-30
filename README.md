@@ -11,7 +11,7 @@ A library for parsing Quantum Chemistry output files into structured data object
 
 ## ☝️ NOTE
 
-This package was originally designed to run as a standalone parser to generate `SinglePointSuccessfulOutput` and `SinglePointFailedOutput` objects parsing all input and provenance data in addition to computed output data; however, once [qcop](https://github.com/coltonbh/qcop) was built to power quantum chemistry programs the only parsing needed was for the simpler `SinglePointComputedProperties` values. There are still remnants of the original `parse` function in the repo and I've left them for now in case I find a use for the general purpose parsing.
+This package was originally designed to run as a standalone parser to generate `SinglePointResult` and `SinglePointFailure` objects parsing all input and provenance data in addition to computed output data; however, once [qcop](https://github.com/coltonbh/qcop) was built to power quantum chemistry programs the only parsing needed was for the simpler `SinglePointComputedProps` values. There are still remnants of the original `parse` function in the repo and I've left them for now in case I find a use for the general purpose parsing.
 
 ## ✨ Basic Usage
 
@@ -21,7 +21,7 @@ This package was originally designed to run as a standalone parser to generate `
   python -m pip install qcparse
   ```
 
-- Parse a file into a `SinglePointComputedProperties` object with a single line of code.
+- Parse a file into a `SinglePointComputedProps` object with a single line of code.
 
   ```python
   from qcparse import parse_computed_props
@@ -29,7 +29,7 @@ This package was originally designed to run as a standalone parser to generate `
   computed = parse_computed_props("/path/to/tc.out", "terachem")
   ```
 
-- The `computed` object will be a `SinglePointComputedProperties` object. Run `dir(computed)` inside a Python interpreter to see the various values you can access. A few prominent values are shown here as an example:
+- The `computed` object will be a `SinglePointComputedProps` object. Run `dir(computed)` inside a Python interpreter to see the various values you can access. A few prominent values are shown here as an example:
 
   ```python
   from qcparse import parse_computed_props
@@ -53,7 +53,7 @@ This package was originally designed to run as a standalone parser to generate `
 - And read from disk like this:
 
   ```py
-  from qcio import SinglePointComputedProperties as SPProps
+  from qcio import SinglePointComputedProps as SPProps
 
   computed = SPProps.open("myresult.json")
   ```
@@ -78,12 +78,12 @@ molecule = Molecule.open("mymolecule.xyz")
 sp_input = SinglePointInput(
     molecule=molecule,
     program_args={
-          "calc_type": "gradient", # "energy" | "gradient" | "hessian"
+          "calctype": "gradient", # "energy" | "gradient" | "hessian"
           "model": {"method": "b3lyp", "basis": "6-31gs"},
           "keywords": {"restricted": True, "purify": "no"} # Keywords are optional
     })
 
-# result will be SinglePointSuccessfulOutput or SinglePointFailedOutput
+# result will be SinglePointResult or SinglePointFailure
 result = compute(sp_input, "terachem")
 ```
 

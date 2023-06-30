@@ -30,12 +30,12 @@ def test_get_parsers_program_collect_inputs():
         assert not parser.input_data
 
 
-def test_get_parsers_program_calc_type():
-    parsers = registry.get_parsers("terachem", calc_type="gradient")
+def test_get_parsers_program_calctype():
+    parsers = registry.get_parsers("terachem", calctype="gradient")
     assert parsers
     for parser in parsers:
         assert isinstance(parser, ParserSpec)
-        assert "gradient" in parser.calc_types
+        assert "gradient" in parser.calctypes
 
 
 def test_supported_programs():

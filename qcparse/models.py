@@ -55,8 +55,7 @@ def single_point_data_collector(collect_inputs: bool = True) -> ParsedDataCollec
     if collect_inputs:
         # Input Objects
         output_obj.input_data = ParsedDataCollector()
-        output_obj.input_data.program_args = ParsedDataCollector()
-        output_obj.input_data.program_args.model = ParsedDataCollector()
+        output_obj.input_data.model = ParsedDataCollector()
 
     # Output Objects
     output_obj.computed = ParsedDataCollector()

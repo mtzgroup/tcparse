@@ -18,7 +18,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, Union
 
-from qcio import Molecule, SinglePointInput, SPCalcType
+from qcio import Molecule
+from qcio import SinglePointCalcType as SPCalcType
+from qcio import SinglePointInput
 
 from qcparse.exceptions import MatchNotFoundError
 from qcparse.models import ParsedDataCollector
@@ -30,17 +32,17 @@ class FileType(str, Enum):
     stdout = "stdout"
 
 
-def parse_calc_type(string: str) -> SPCalcType:
-    """Parse the calc_type from TeraChem stdout."""
-    calc_types = (
+def parse_calctype(string: str) -> SPCalcType:
+    """Parse the calctype from TeraChem stdout."""
+    calctypes = (
         (SPCalcType.energy, r"SINGLE POINT ENERGY CALCULATIONS"),
         (SPCalcType.gradient, r"SINGLE POINT GRADIENT CALCULATIONS"),
         (SPCalcType.hessian, r"FREQUENCY ANALYSIS"),
     )
-    for calc_type, regex in calc_types:
+    for calctype, regex in calctypes:
         match = re.search(regex, string)
         if match:
-            return calc_type
+            return calctype
     raise MatchNotFoundError(regex, string)
 
 
@@ -85,9 +87,7 @@ def parse_energy(string: str, data_collector: ParsedDataCollector):
 def parse_method(string: str, data_collector: ParsedDataCollector):
     """Parse the method from TeraChem stdout."""
     regex = r"Method: (\S+)"
-    data_collector.input_data.program_args.model.method = regex_search(
-        regex, string
-    ).group(1)
+    data_collector.input_data.model.method = regex_search(regex, string).group(1)
 
 
 @parser(filetype=FileType.stdout)
@@ -101,9 +101,7 @@ def parse_working_directory(string: str, data_collector: ParsedDataCollector):
 def parse_basis(string: str, data_collector: ParsedDataCollector):
     """Parse the basis from TeraChem stdout."""
     regex = r"Using basis set: (\S+)"
-    data_collector.input_data.program_args.model.basis = regex_search(
-        regex, string
-    ).group(1)
+    data_collector.input_data.model.basis = regex_search(regex, string).group(1)
 
 
 def parse_git_commit(string: str) -> str:
